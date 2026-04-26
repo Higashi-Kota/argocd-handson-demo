@@ -610,4 +610,4 @@ spec:
 
 ---
 
-[← 前へ 11 Notifications](11-notifications.md) | [↑ ハンズオン全章 (README)](../README.md)
+[← 前へ 11 Notifications](11-notifications.md) | [次へ → 13 GitHub Actions to GHCR](13-github-actions-ghcr.md) | [↑ ハンズオン全章 (README)](../README.md)

@@ -30,13 +30,14 @@ flowchart LR
     Root --> Adv5[11 Notifications]
 
     Root --> BG[12 Blue/Green Deployment]
+    Root --> CI[13 GitHub Actions to GHCR]
 
     classDef core fill:#cce5ff,stroke:#004080
     classDef adv fill:#fff3cd,stroke:#856404
     classDef scenario fill:#d4edda,stroke:#155724
     class Pre,Env,Build,App,Pin,Multi,Root core
     class Adv1,Adv2,Adv3,Adv4,Adv5 adv
-    class BG scenario
+    class BG,CI scenario
 ```
 
 ## 想定読者
@@ -53,7 +54,7 @@ flowchart LR
 | 環境構築 (00 + 01) | 30〜60 分 |
 | 中核 5 章 (02〜06) | 2〜3 時間 |
 | 発展課題 5 章 (07〜11) | 各 30〜60 分、必要なものだけ |
-| Blue/Green シナリオ (12) | 1 時間 |
+| シナリオ (12 Blue/Green、13 GHCR CI/CD) | 各 1 時間 |
 
 **ゼロから 06 まで通しで実施: 約 4〜5 時間**。
 
@@ -64,9 +65,10 @@ flowchart TB
     subgraph GitHub
         AppRepo[(argocd-handson-demo-app)]
         ManifestsRepo[(argocd-handson-demo-manifests)]
+        GHCR[(ghcr.io<br/>container registry)]
     end
 
-    subgraph KindCluster["kind cluster (argocd-handson)"]
+    subgraph KindCluster["kind cluster argocd-handson"]
         subgraph ArgocdNs["Namespace: argocd"]
             ArgoCDServer[argocd-server]
             RootApp[Application: root-app]
@@ -86,11 +88,15 @@ flowchart TB
         end
     end
 
-    AppRepo -.docker build:v0.1.0.-> KindNode[(kind node\nimage cache)]
+    AppRepo -->|tag push triggers CI| GHCR
+    GHCR -->|image pull| DevPod
+    GHCR -->|image pull| StgPod
+    GHCR -->|image pull| ProdPod
     ManifestsRepo --> ArgoCDServer
-    KindNode -.IfNotPresent.-> DevPod & StgPod & ProdPod
 
-    RootApp --> HelloDev & HelloStg & HelloProd
+    RootApp --> HelloDev
+    RootApp --> HelloStg
+    RootApp --> HelloProd
     HelloDev --> DevPod
     HelloStg --> StgPod
     HelloProd --> ProdPod
@@ -116,6 +122,7 @@ flowchart TB
 
 ### シナリオ
 13. [12 - Blue/Green Deployment (Argo Rollouts)](docs/12-blue-green-deployment.md)
+14. [13 - GitHub Actions to GHCR (CI/CD パイプライン)](docs/13-github-actions-ghcr.md)
 
 ## リポジトリ構成
 
